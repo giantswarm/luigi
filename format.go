@@ -13,30 +13,9 @@ func format(text []byte) string {
 		return string(text)
 	}
 
-	var line string
+	line, msg := levelMessage(m)
 
-	var msg string
-	if len(m["debug"]) > 0 {
-		line += "D "
-		msg = m["debug"]
-		delete(m, "debug")
-	} else if len(m["info"]) > 0 {
-		line += "I "
-		msg = m["info"]
-		delete(m, "info")
-	} else if len(m["warning"]) > 0 {
-		line += "W "
-		msg = m["warning"]
-		delete(m, "warning")
-	} else if len(m["error"]) > 0 {
-		line += "E "
-		msg = m["error"]
-		delete(m, "error")
-	} else {
-		line += "U "
-	}
-
-	line += m["time"][2 : len(m["time"])-4] // Skip '20' in year and millis.
+	line += " " + m["time"][2:len(m["time"])-4] // Skip '20' in year and millis.
 	delete(m, "time")
 
 	obj := m["object"] // Set by operatorkit framework.
@@ -78,4 +57,54 @@ func format(text []byte) string {
 	// TODO object
 
 	return line
+}
+
+func levelMessage(m map[string]string) (level string, message string) {
+	switch m["level"] {
+	case "debug":
+		level = "D"
+	case "info":
+		level = "I"
+	case "warning":
+		level = "W"
+	case "error":
+		level = "E"
+	case "":
+		// Catch empty string to run fallback.
+	default:
+		level = "U"
+	}
+
+	message = m["message"]
+
+	if len(level) > 0 && len(message) > 0 {
+		delete(m, "level")
+		delete(m, "message")
+		return
+	}
+
+	// Fallback to old handling.
+
+	switch {
+	case len(m["debug"]) > 0:
+		level = "D"
+		message = m["debug"]
+		delete(m, "debug")
+	case len(m["info"]) > 0:
+		level = "I"
+		message = m["info"]
+		delete(m, "info")
+	case len(m["warning"]) > 0:
+		level = "W"
+		message = m["warning"]
+		delete(m, "warning")
+	case len(m["error"]) > 0:
+		level = "E"
+		message = m["error"]
+		delete(m, "error")
+	default:
+		level = "U"
+	}
+
+	return
 }
