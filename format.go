@@ -13,7 +13,7 @@ func format(text []byte) string {
 		return string(text)
 	}
 
-	line, msg := levelMessage(m)
+	line, msg := getLevelMessage(m)
 
 	line += " " + m["time"][2:len(m["time"])-4] // Skip '20' in year and millis.
 	delete(m, "time")
@@ -40,6 +40,8 @@ func format(text []byte) string {
 	}
 	line += " | " + caller
 
+	stack := getStack(m)
+
 	keys := make([]string, len(m))
 	{
 		var i int
@@ -54,12 +56,14 @@ func format(text []byte) string {
 		line += " | " + k + "=" + m[k]
 	}
 
+	line += stack
+
 	// TODO object
 
 	return line
 }
 
-func levelMessage(m map[string]string) (level string, message string) {
+func getLevelMessage(m map[string]string) (level string, message string) {
 	switch m["level"] {
 	case "debug":
 		level = "D"
@@ -107,4 +111,26 @@ func levelMessage(m map[string]string) (level string, message string) {
 	}
 
 	return
+}
+
+func getStack(m map[string]string) string {
+	stack := m["stack"]
+	if len(stack) == 0 {
+		return ""
+	}
+
+	if !strings.HasPrefix(stack, "[{") {
+		return ""
+	}
+	if !strings.HasSuffix(stack, "}]") {
+		return ""
+	}
+
+	delete(m, "stack")
+
+	stack = stack[2 : len(stack)-2]
+	stack = "\n\t" + stack
+	stack = strings.Replace(stack, "} {", "\n\t", -1)
+
+	return stack
 }
