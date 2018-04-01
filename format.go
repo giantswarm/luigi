@@ -40,7 +40,7 @@ func format(text []byte) string {
 	}
 
 	if len(msg) > 0 {
-		line += " " + msg
+		line += " " + white(msg)
 	}
 
 	caller := m["caller"]
