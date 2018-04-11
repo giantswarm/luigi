@@ -4,6 +4,21 @@ import (
 	"encoding/json"
 	"sort"
 	"strings"
+
+	"github.com/fatih/color"
+)
+
+var (
+	black   = color.New(color.FgBlack).SprintFunc()
+	red     = color.New(color.FgRed).SprintFunc()
+	green   = color.New(color.FgGreen).SprintFunc()
+	yellow  = color.New(color.FgYellow).SprintFunc()
+	blue    = color.New(color.FgBlue).SprintFunc()
+	magenta = color.New(color.FgMagenta).SprintFunc()
+	cyan    = color.New(color.FgCyan).SprintFunc()
+	white   = color.New(color.FgWhite).SprintFunc()
+
+	separator = red(" | ")
 )
 
 func format(text []byte) string {
@@ -15,17 +30,17 @@ func format(text []byte) string {
 
 	line, msg := getLevelMessage(m)
 
-	line += " " + m["time"][2:len(m["time"])-4] // Skip '20' in year and millis.
+	line += " " + cyan(m["time"][2:len(m["time"])-4]) // Skip '20' in year and millis.
 	delete(m, "time")
 
 	obj := m["object"] // Set by operatorkit framework.
 	delete(m, "object")
 	if len(obj) > 0 {
-		line += " " + obj
+		line += " " + yellow(obj)
 	}
 
 	if len(msg) > 0 {
-		line += " " + msg
+		line += " " + white(msg)
 	}
 
 	caller := m["caller"]
@@ -38,7 +53,7 @@ func format(text []byte) string {
 		}
 		caller = strings.TrimPrefix(caller, "github.com/giantswarm/")
 	}
-	line += " | " + caller
+	line += separator + yellow(caller)
 
 	stack := getStack(m)
 
@@ -53,7 +68,7 @@ func format(text []byte) string {
 	}
 
 	for _, k := range keys {
-		line += " | " + k + "=" + m[k]
+		line += separator + green(k+"="+m[k])
 	}
 
 	line += stack
@@ -66,17 +81,17 @@ func format(text []byte) string {
 func getLevelMessage(m map[string]string) (level string, message string) {
 	switch m["level"] {
 	case "debug":
-		level = "D"
+		level = white("D")
 	case "info":
-		level = "I"
+		level = cyan("I")
 	case "warning":
-		level = "W"
+		level = yellow("W")
 	case "error":
-		level = "E"
+		level = red("E")
 	case "":
 		// Catch empty string to run fallback.
 	default:
-		level = "U"
+		level = white("U")
 	}
 
 	message = m["message"]
@@ -91,23 +106,23 @@ func getLevelMessage(m map[string]string) (level string, message string) {
 
 	switch {
 	case len(m["debug"]) > 0:
-		level = "D"
+		level = white("D")
 		message = m["debug"]
 		delete(m, "debug")
 	case len(m["info"]) > 0:
-		level = "I"
+		level = cyan("I")
 		message = m["info"]
 		delete(m, "info")
 	case len(m["warning"]) > 0:
-		level = "W"
+		level = yellow("W")
 		message = m["warning"]
 		delete(m, "warning")
 	case len(m["error"]) > 0:
-		level = "E"
+		level = red("E")
 		message = m["error"]
 		delete(m, "error")
 	default:
-		level = "U"
+		level = white("U")
 	}
 
 	return
