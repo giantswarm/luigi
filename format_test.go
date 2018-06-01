@@ -40,9 +40,11 @@ func Test_format(t *testing.T) {
 	disable_colors(true)
 
 	for i, tc := range testCases {
-		out := format([]byte(tc.text))
-		if out != tc.expectedOut {
-			t.Errorf("test %d:\n%q\nwant:\n%q", i, out, tc.expectedOut)
-		}
+		t.Run(tc.name, func(t *testing.T) {
+			out := format([]byte(tc.text))
+			if out != tc.expectedOut {
+				t.Errorf("test %d:\n%q\nwant:\n%q", i, out, tc.expectedOut)
+			}
+		})
 	}
 }
