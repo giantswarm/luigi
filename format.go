@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/giantswarm/microerror"
 )
 
 var (
@@ -36,11 +37,25 @@ func disable_colors(v bool) {
 	separator = red(" | ")
 }
 
-func format(text []byte) string {
+func format(text []byte, grep map[string]string) (string, error) {
 	var m map[string]string
 	err := json.Unmarshal(text, &m)
 	if err != nil {
-		return string(text)
+		return "", microerror.Mask(err)
+	}
+
+	if len(grep) > 0 {
+		var notFoundElements []string
+		for k, v := range grep {
+			logVal, exists := m[k]
+			if !exists || logVal != v {
+				notFoundElements = append(notFoundElements, k)
+			}
+		}
+
+		if len(notFoundElements) > 0 {
+			return "", microerror.Maskf(grepNotFoundError, strings.Join(notFoundElements, ", "))
+		}
 	}
 
 	line, msg := getLevelMessage(m)
@@ -90,7 +105,7 @@ func format(text []byte) string {
 
 	// TODO object
 
-	return line
+	return line, nil
 }
 
 func getLevelMessage(m map[string]string) (level string, message string) {
