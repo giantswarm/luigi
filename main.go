@@ -5,8 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	"github.com/fatih/color"
 )
 
 func main() {
@@ -15,10 +13,10 @@ func main() {
 	flag.Parse()
 
 	if *flagNoColor {
-		color.NoColor = true
+		disable_colors(true)
 	}
 	if *flagForceColor {
-		color.NoColor = false
+		disable_colors(false)
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)

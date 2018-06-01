@@ -21,6 +21,21 @@ var (
 	separator = red(" | ")
 )
 
+func disable_colors(v bool) {
+	color.NoColor = v
+
+	black = color.New(color.FgBlack).SprintFunc()
+	red = color.New(color.FgRed).SprintFunc()
+	green = color.New(color.FgGreen).SprintFunc()
+	yellow = color.New(color.FgYellow).SprintFunc()
+	blue = color.New(color.FgBlue).SprintFunc()
+	magenta = color.New(color.FgMagenta).SprintFunc()
+	cyan = color.New(color.FgCyan).SprintFunc()
+	white = color.New(color.FgWhite).SprintFunc()
+
+	separator = red(" | ")
+}
+
 func format(text []byte) string {
 	var m map[string]string
 	err := json.Unmarshal(text, &m)
