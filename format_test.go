@@ -109,6 +109,10 @@ func Test_format(t *testing.T) {
 				t.Fatalf("error == %#v, want matching", err)
 			}
 
+			if tc.errorMatcher != nil {
+				return
+			}
+
 			if out != tc.expectedOut {
 				t.Errorf("test %d:\n%q\nwant:\n%q", i, out, tc.expectedOut)
 			}
