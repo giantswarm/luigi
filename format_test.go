@@ -37,7 +37,7 @@ func Test_format(t *testing.T) {
 		},
 	}
 
-	disable_colors(true)
+	disableColors(true)
 
 	for i, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

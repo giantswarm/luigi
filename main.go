@@ -13,10 +13,10 @@ func main() {
 	flag.Parse()
 
 	if *flagNoColor {
-		disable_colors(true)
+		disableColors(true)
 	}
 	if *flagForceColor {
-		disable_colors(false)
+		disableColors(false)
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
