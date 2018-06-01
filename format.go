@@ -22,7 +22,7 @@ var (
 	separator = red(" | ")
 )
 
-func disable_colors(v bool) {
+func disableColors(v bool) {
 	color.NoColor = v
 
 	black = color.New(color.FgBlack).SprintFunc()
