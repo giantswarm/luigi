@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/giantswarm/microerror"
 )
 
 var (
@@ -21,11 +23,40 @@ var (
 	separator = red(" | ")
 )
 
-func format(text []byte) string {
+func disableColors(v bool) {
+	color.NoColor = v
+
+	black = color.New(color.FgBlack).SprintFunc()
+	red = color.New(color.FgRed).SprintFunc()
+	green = color.New(color.FgGreen).SprintFunc()
+	yellow = color.New(color.FgYellow).SprintFunc()
+	blue = color.New(color.FgBlue).SprintFunc()
+	magenta = color.New(color.FgMagenta).SprintFunc()
+	cyan = color.New(color.FgCyan).SprintFunc()
+	white = color.New(color.FgWhite).SprintFunc()
+
+	separator = red(" | ")
+}
+
+func format(text []byte, grep map[string]string) (string, error) {
 	var m map[string]string
 	err := json.Unmarshal(text, &m)
 	if err != nil {
-		return string(text)
+		return "", microerror.Mask(err)
+	}
+
+	if len(grep) > 0 {
+		var notFoundElements []string
+		for k, v := range grep {
+			logVal, exists := m[k]
+			if !exists || logVal != v {
+				notFoundElements = append(notFoundElements, fmt.Sprintf("%s=%q", k, v))
+			}
+		}
+
+		if len(notFoundElements) > 0 {
+			return "", microerror.Maskf(grepNotFoundError, strings.Join(notFoundElements, ", "))
+		}
 	}
 
 	line, msg := getLevelMessage(m)
@@ -75,7 +106,7 @@ func format(text []byte) string {
 
 	// TODO object
 
-	return line
+	return line, nil
 }
 
 func getLevelMessage(m map[string]string) (level string, message string) {
