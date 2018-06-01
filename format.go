@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strings"
 
@@ -49,7 +50,7 @@ func format(text []byte, grep map[string]string) (string, error) {
 		for k, v := range grep {
 			logVal, exists := m[k]
 			if !exists || logVal != v {
-				notFoundElements = append(notFoundElements, k)
+				notFoundElements = append(notFoundElements, fmt.Sprintf("%s=%q", k, v))
 			}
 		}
 
