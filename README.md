@@ -1,6 +1,6 @@
 # luigi
 
-## Instalation
+## Installation
 
 ```
 go get github.com/giantswarm/luigi
