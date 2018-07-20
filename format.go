@@ -70,6 +70,22 @@ func format(text []byte, grep map[string]string) (string, error) {
 		line += " " + yellow(obj)
 	}
 
+	resource := m["resource"] // Set by operatorkit framework.
+	delete(m, "resource")
+	if len(resource) > 0 {
+		line += " " + resource
+	}
+
+	function := m["function"] // Set by operatorkit framework.
+	delete(m, "function")
+	if len(function) > 0 {
+		if len(resource) > 0 {
+			line += "." + function
+		} else {
+			line += " " + function
+		}
+	}
+
 	if len(msg) > 0 {
 		line += " " + white(msg)
 	}
