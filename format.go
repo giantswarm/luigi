@@ -42,7 +42,7 @@ func format(text []byte, grep map[string]string) (string, error) {
 	var m map[string]string
 	err := json.Unmarshal(text, &m)
 	if err != nil {
-		return "", microerror.Mask(err)
+		return string(text), nil
 	}
 
 	if len(grep) > 0 {
