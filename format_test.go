@@ -90,6 +90,24 @@ func Test_format(t *testing.T) {
 			expectedOut:  "",
 			errorMatcher: IsGrepNotFound,
 		},
+		{
+			name:         "case 6: be gentle with non-json input",
+			text:         `== some none JSON text ==`,
+			expectedOut:  `== some none JSON text ==`,
+			errorMatcher: nil,
+		},
+		{
+			name:         "case 7: be gentle with json-pretending input",
+			text:         `{"i'm nota valid json": no-quotes-text}`,
+			expectedOut:  `{"i'm nota valid json": no-quotes-text}`,
+			errorMatcher: nil,
+		},
+		{
+			name:         "case 8: be gentle even with emoji input",
+			text:         `🌅`,
+			expectedOut:  `🌅`,
+			errorMatcher: nil,
+		},
 	}
 
 	disableColors(true)
