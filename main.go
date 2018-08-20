@@ -5,9 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 
-	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/luigi/pkg"
 )
 
 func main() {
@@ -23,7 +22,7 @@ func main() {
 		disableColors(false)
 	}
 
-	grep, err := parseGrepFlag(*flagGrep)
+	grep, err := pkg.NewGrep(*flagGrep)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
@@ -31,8 +30,8 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		line, err := format(scanner.Bytes(), grep)
-		if IsGrepNotFound(err) {
+		line, ok, err := format(scanner.Bytes(), grep)
+		if !ok {
 			continue
 		}
 		if err != nil {
@@ -46,23 +45,4 @@ func main() {
 		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 		os.Exit(1)
 	}
-}
-
-func parseGrepFlag(s string) (map[string]string, error) {
-	if len(s) == 0 {
-		return nil, nil
-	}
-
-	grep := make(map[string]string)
-
-	for _, kv := range strings.Split(s, ",") {
-		pair := strings.Split(kv, "=")
-		if len(pair) != 2 {
-			return nil, microerror.Maskf(parseError, "invalid key=value pair: '%q'", kv)
-		}
-
-		grep[strings.TrimSpace(pair[0])] = strings.TrimSpace(pair[1])
-	}
-
-	return grep, nil
 }
