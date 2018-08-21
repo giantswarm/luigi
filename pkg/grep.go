@@ -18,12 +18,13 @@ func NewGrep(expr string) (*Grep, error) {
 			if len(pair) != 2 {
 				return nil, fmt.Errorf("grep: invalid key=value pair %q in expression %q", kv, expr)
 			}
-			k := pair[0]
-			v := pair[1]
+			k := strings.TrimSpace(pair[0])
+			v := strings.TrimSpace(pair[1])
 
 			equal := true
 			if k[len(k)-1] == '!' {
 				k = k[:len(k)-1]
+				k = strings.TrimSpace(k)
 				equal = false
 			}
 
