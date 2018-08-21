@@ -2,12 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/luigi/pkg"
 )
 
 var (
@@ -38,25 +37,15 @@ func disableColors(v bool) {
 	separator = red(" | ")
 }
 
-func format(text []byte, grep map[string]string) (string, error) {
+func format(text []byte, grep *pkg.Grep) (string, bool, error) {
 	var m map[string]string
 	err := json.Unmarshal(text, &m)
 	if err != nil {
-		return string(text), nil
+		return string(text), true, nil
 	}
 
-	if len(grep) > 0 {
-		var notFoundElements []string
-		for k, v := range grep {
-			logVal, exists := m[k]
-			if !exists || logVal != v {
-				notFoundElements = append(notFoundElements, fmt.Sprintf("%s=%q", k, v))
-			}
-		}
-
-		if len(notFoundElements) > 0 {
-			return "", microerror.Maskf(grepNotFoundError, strings.Join(notFoundElements, ", "))
-		}
+	if !grep.Filter(m) {
+		return "", false, nil
 	}
 
 	line, msg := getLevelMessage(m)
@@ -122,7 +111,7 @@ func format(text []byte, grep map[string]string) (string, error) {
 
 	// TODO object
 
-	return line, nil
+	return line, true, nil
 }
 
 func getLevelMessage(m map[string]string) (level string, message string) {
