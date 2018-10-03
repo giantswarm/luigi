@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/giantswarm/luigi/pkg"
@@ -50,8 +51,15 @@ func format(text []byte, grep *pkg.Grep) (string, bool, error) {
 
 	line, msg := getLevelMessage(m)
 
-	line += " " + cyan(m["time"][2:len(m["time"])-4]) // Skip '20' in year and millis.
+	timeString := m["time"]
 	delete(m, "time")
+	if timeString != "" {
+		t, err := time.Parse("2006-01-02T15:04:05.999999-07:00", timeString)
+		if err == nil {
+			timeString = t.Format("01/02 15:04:05")
+		}
+	}
+	line += " " + cyan(timeString)
 
 	obj := m["object"] // Set by operatorkit framework.
 	delete(m, "object")
