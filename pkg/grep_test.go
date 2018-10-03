@@ -151,6 +151,78 @@ func Test_Grep(t *testing.T) {
 			in:      map[string]string{},
 			isError: true,
 		},
+		{
+			name:        "case 23: wildcard prefix",
+			expr:        "a=*-abc",
+			in:          map[string]string{"a": "prefix-abc"},
+			expectedOut: true,
+		},
+		{
+			name:        "case 24: wildcard prefix not match",
+			expr:        "a=*-abc",
+			in:          map[string]string{"a": "prefix-xyz"},
+			expectedOut: false,
+		},
+		{
+			name:        "case 25: wildcard prefix with negation",
+			expr:        "a!=*-abc",
+			in:          map[string]string{"a": "prefix-xyz"},
+			expectedOut: true,
+		},
+		{
+			name:        "case 26: wildcard prefix with negation not match",
+			expr:        "a!=*-abc",
+			in:          map[string]string{"a": "prefix-abc"},
+			expectedOut: false,
+		},
+		{
+			name:        "case 27: wildcard suffix",
+			expr:        "a=abc-*",
+			in:          map[string]string{"a": "abc-suffix"},
+			expectedOut: true,
+		},
+		{
+			name:        "case 28: wildcard suffix not match",
+			expr:        "a=abc-*",
+			in:          map[string]string{"a": "xyz-suffix"},
+			expectedOut: false,
+		},
+		{
+			name:        "case 29: wildcard suffix with negation",
+			expr:        "a!=abc-*",
+			in:          map[string]string{"a": "xyz-suffix"},
+			expectedOut: true,
+		},
+		{
+			name:        "case 30: wildcard suffix with negation not match",
+			expr:        "a!=abc-*",
+			in:          map[string]string{"a": "abc-suffix"},
+			expectedOut: false,
+		},
+		{
+			name:        "case 27: wildcard prefix and suffix",
+			expr:        "a=*-abc-*",
+			in:          map[string]string{"a": "prefix-abc-suffix"},
+			expectedOut: true,
+		},
+		{
+			name:        "case 28: wildcard prefix and suffix not match",
+			expr:        "a=*-abc-*",
+			in:          map[string]string{"a": "prefix-xyz-suffix"},
+			expectedOut: false,
+		},
+		{
+			name:        "case 29: wildcard prefix and suffix with negation",
+			expr:        "a!=*-abc-*",
+			in:          map[string]string{"a": "prefix-xyz-suffix"},
+			expectedOut: true,
+		},
+		{
+			name:        "case 30: wildcard prefix and suffix with negation not match",
+			expr:        "a!=*-abc-*",
+			in:          map[string]string{"a": "prefix-abc-suffix"},
+			expectedOut: false,
+		},
 	}
 
 	for _, tc := range testCases {
