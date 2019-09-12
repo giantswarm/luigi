@@ -98,6 +98,24 @@ func Test_format(t *testing.T) {
 			expectedOut:  ``,
 			errorMatcher: IsJsonParse,
 		},
+		{
+			name:         "case 9: ignore `null`",
+			text:         `null`,
+			expectedOut:  ``,
+			errorMatcher: IsJsonParse,
+		},
+		{
+			name:         "case 10: ignore numbers",
+			text:         `7`,
+			expectedOut:  ``,
+			errorMatcher: IsJsonParse,
+		},
+		{
+			name:         "case 11: ignore empty lines",
+			text:         ``,
+			expectedOut:  ``,
+			errorMatcher: IsJsonParse,
+		},
 	}
 
 	disableColors(true)
