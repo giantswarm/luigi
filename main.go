@@ -29,17 +29,19 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Split(newSplitter().Split)
 	for scanner.Scan() {
-		line, ok, err := format(scanner.Bytes(), grep)
-		if !ok {
-			continue
-		}
-		if err != nil {
+		line, err := format(scanner.Bytes(), grep)
+		if IsJsonParse(err) {
+			line = scanner.Text()
+		} else if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
+		} else {
+			line += "\n"
 		}
 
-		fmt.Printf("%s\n", line)
+		fmt.Printf("%s", line)
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "reading standard input:", err)

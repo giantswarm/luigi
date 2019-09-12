@@ -8,6 +8,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/giantswarm/luigi/pkg"
+	"github.com/giantswarm/microerror"
 )
 
 var (
@@ -38,15 +39,15 @@ func disableColors(v bool) {
 	separator = red(" | ")
 }
 
-func format(text []byte, grep *pkg.Grep) (string, bool, error) {
+func format(text []byte, grep *pkg.Grep) (string, error) {
 	var m map[string]string
 	err := json.Unmarshal(text, &m)
 	if err != nil {
-		return string(text), true, nil
+		return "", microerror.Maskf(jsonParseError, err.Error())
 	}
 
 	if !grep.Filter(m) {
-		return "", false, nil
+		return "", nil
 	}
 
 	line, msg := getLevelMessage(m)
@@ -119,7 +120,7 @@ func format(text []byte, grep *pkg.Grep) (string, bool, error) {
 
 	// TODO object
 
-	return line, true, nil
+	return line, nil
 }
 
 func getLevelMessage(m map[string]string) (level string, message string) {
@@ -189,6 +190,7 @@ func getStack(m map[string]string) string {
 
 	stack = stack[2 : len(stack)-2]
 	stack = "\n\t" + stack
+	stack = strings.Replace(stack, " } {", "\n\t", -1)
 	stack = strings.Replace(stack, "} {", "\n\t", -1)
 
 	return stack
