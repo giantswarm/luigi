@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -40,7 +41,17 @@ func disableColors(v bool) {
 }
 
 func format(text []byte, grep *pkg.Grep) (string, error) {
-	var m map[string]string
+	//// TODO test
+	//if len(text) == 0 {
+	//	return "", nil
+	//}
+	//// TODO test
+	//// Avoid parsing non-object JSON inputs.
+	//if text[0] != '{' {
+	//	return text, nil
+	//}
+
+	var m map[string]interface{}
 	err := json.Unmarshal(text, &m)
 	if err != nil {
 		return "", microerror.Maskf(jsonParseError, err.Error())
@@ -52,7 +63,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 
 	line, msg := getLevelMessage(m)
 
-	timeString := m["time"]
+	timeString := getString(m, "time")
 	delete(m, "time")
 	if timeString != "" {
 		t, err := time.Parse("2006-01-02T15:04:05.999999-07:00", timeString)
@@ -62,19 +73,19 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 	}
 	line += " " + cyan(timeString)
 
-	obj := m["object"] // Set by operatorkit framework.
+	obj := getString(m, "object") // Set by operatorkit framework.
 	delete(m, "object")
 	if len(obj) > 0 {
 		line += " " + yellow(obj)
 	}
 
-	resource := m["resource"] // Set by operatorkit framework.
+	resource := getString(m, "resource") // Set by operatorkit framework.
 	delete(m, "resource")
 	if len(resource) > 0 {
 		line += " " + resource
 	}
 
-	function := m["function"] // Set by operatorkit framework.
+	function := getString(m, "function") // Set by operatorkit framework.
 	delete(m, "function")
 	if len(function) > 0 {
 		if len(resource) > 0 {
@@ -88,7 +99,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 		line += " " + white(msg)
 	}
 
-	caller := m["caller"]
+	caller := getString(m, "caller")
 	delete(m, "caller")
 	{
 		s := "/vendor/"
@@ -113,7 +124,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 	}
 
 	for _, k := range keys {
-		line += separator + green(k+"="+m[k])
+		line += separator + green(k+"="+getString(m, k))
 	}
 
 	line += stack
@@ -123,7 +134,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 	return line, nil
 }
 
-func getLevelMessage(m map[string]string) (level string, message string) {
+func getLevelMessage(m map[string]interface{}) (level string, message string) {
 	switch m["level"] {
 	case "debug":
 		level = white("D")
@@ -139,7 +150,7 @@ func getLevelMessage(m map[string]string) (level string, message string) {
 		level = white("U")
 	}
 
-	message = m["message"]
+	message = getString(m, "message")
 
 	if len(level) > 0 && len(message) > 0 {
 		delete(m, "level")
@@ -150,21 +161,21 @@ func getLevelMessage(m map[string]string) (level string, message string) {
 	// Fallback to old handling.
 
 	switch {
-	case len(m["debug"]) > 0:
+	case len(getString(m, "debug")) > 0:
 		level = white("D")
-		message = m["debug"]
+		message = getString(m, "debug")
 		delete(m, "debug")
-	case len(m["info"]) > 0:
+	case len(getString(m, "info")) > 0:
 		level = cyan("I")
-		message = m["info"]
+		message = getString(m, "info")
 		delete(m, "info")
-	case len(m["warning"]) > 0:
+	case len(getString(m, "warning")) > 0:
 		level = yellow("W")
-		message = m["warning"]
+		message = getString(m, "warning")
 		delete(m, "warning")
-	case len(m["error"]) > 0:
+	case len(getString(m, "error")) > 0:
 		level = red("E")
-		message = m["error"]
+		message = getString(m, "error")
 		delete(m, "error")
 	default:
 		level = white("U")
@@ -173,8 +184,8 @@ func getLevelMessage(m map[string]string) (level string, message string) {
 	return
 }
 
-func getStack(m map[string]string) string {
-	stack := m["stack"]
+func getStack(m map[string]interface{}) string {
+	stack := getString(m, "stack")
 	if len(stack) == 0 {
 		return ""
 	}
@@ -194,4 +205,15 @@ func getStack(m map[string]string) string {
 	stack = strings.Replace(stack, "} {", "\n\t", -1)
 
 	return stack
+}
+
+func getString(m map[string]interface{}, key string) string {
+	v := m[key]
+
+	s, ok := v.(string)
+	if ok {
+		return s
+	}
+
+	return fmt.Sprintf("%v", s)
 }
