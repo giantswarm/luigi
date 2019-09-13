@@ -84,37 +84,37 @@ func Test_format(t *testing.T) {
 			name:         "case 6: be gentle with non-json input",
 			text:         `== some none JSON text ==`,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 		{
 			name:         "case 7: be gentle with json-pretending input",
 			text:         `{"i'm not a valid json": no-quotes-text}`,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 		{
 			name:         "case 8: be gentle even with emoji input",
 			text:         `🌅`,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 		{
 			name:         "case 9: ignore `null`",
 			text:         `null`,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 		{
 			name:         "case 10: ignore numbers",
 			text:         `7`,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 		{
 			name:         "case 11: ignore empty lines",
 			text:         ``,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 	}
 

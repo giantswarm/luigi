@@ -41,16 +41,16 @@ func disableColors(v bool) {
 
 func format(text []byte, grep *pkg.Grep) (string, error) {
 	if len(text) == 0 {
-		return "", microerror.Maskf(jsonParseError, "empty string")
+		return "", microerror.Maskf(jsonObjectParseError, "empty string")
 	}
 	if text[0] != '{' {
-		return "", microerror.Maskf(jsonParseError, "text must start with %#q", "{")
+		return "", microerror.Maskf(jsonObjectParseError, "text must start with %#q", "{")
 	}
 
 	var m map[string]string
 	err := json.Unmarshal(text, &m)
 	if err != nil {
-		return "", microerror.Maskf(jsonParseError, err.Error())
+		return "", microerror.Maskf(jsonObjectParseError, err.Error())
 	}
 
 	if !grep.Filter(m) {

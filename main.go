@@ -32,7 +32,7 @@ func main() {
 	scanner.Split(newSplitter().Split)
 	for scanner.Scan() {
 		line, err := format(scanner.Bytes(), grep)
-		if IsJsonParse(err) {
+		if IsJSONObjectParse(err) {
 			line = scanner.Text()
 		} else if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
