@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-go get github.com/giantswarm/luigi
+GO111MODULE="on" go get github.com/giantswarm/luigi
 ```
 
 ## Usage
