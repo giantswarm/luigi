@@ -141,16 +141,14 @@ func getLevelMessage(m map[string]interface{}) (level string, message string) {
 		level = yellow("W")
 	case "error":
 		level = red("E")
-	case "":
-		// Catch empty string to run fallback.
 	default:
 		level = white("U")
 	}
+	delete(m, "level")
 
 	message = getString(m, "message")
 
-	if len(level) > 0 {
-		delete(m, "level")
+	if len(level) > 0 && len(message) > 0 {
 		delete(m, "message")
 		return
 	}
@@ -174,7 +172,9 @@ func getLevelMessage(m map[string]interface{}) (level string, message string) {
 		level = red("E")
 		message = getString(m, "error")
 		delete(m, "error")
-	default:
+	}
+
+	if len(level) == 0 {
 		level = white("U")
 	}
 
