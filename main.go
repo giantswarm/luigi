@@ -34,6 +34,9 @@ func main() {
 		line, err := format(scanner.Bytes(), grep)
 		if IsJSONObjectParse(err) {
 			line = scanner.Text()
+		} else if IsSkip(err) {
+			// Don't print empty line.
+			line = ""
 		} else if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)

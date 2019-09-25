@@ -54,7 +54,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 	}
 
 	if !grep.Filter(m) {
-		return "", nil
+		return "", microerror.Maskf(skipError, "line does not match grep criteria")
 	}
 
 	line, msg := getLevelMessage(m)
