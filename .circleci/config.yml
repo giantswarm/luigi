@@ -1,0 +1,14 @@
+version: 2.1
+orbs:
+  architect: giantswarm/architect@0.4.0
+
+workflows:
+  go-build:
+    jobs:
+      - architect/go-build:
+          name: go-build-luigi
+          binary: luigi
+          # Needed to trigger job also on git tag.
+          filters:
+            tags:
+              only: /^v.*/
