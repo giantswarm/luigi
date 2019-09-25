@@ -197,6 +197,7 @@ func getStack(m map[string]string) string {
 
 	stack = stack[2 : len(stack)-2]
 	stack = "\n\t" + stack
+	stack = strings.Replace(stack, " } {", "\n\t", -1)
 	stack = strings.Replace(stack, "} {", "\n\t", -1)
 
 	return stack
