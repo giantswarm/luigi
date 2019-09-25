@@ -2,11 +2,20 @@ package main
 
 import "github.com/giantswarm/microerror"
 
-var jsonParseError = &microerror.Error{
-	Kind: "jsonParseError",
+var jsonObjectParseError = &microerror.Error{
+	Kind: "jsonObjectParseError",
 }
 
-// IsJsonParse asserts jsonParseError.
-func IsJsonParse(err error) bool {
-	return microerror.Cause(err) == jsonParseError
+// IsJSONObjectParse asserts jsonObjectParseError.
+func IsJSONObjectParse(err error) bool {
+	return microerror.Cause(err) == jsonObjectParseError
+}
+
+var skipError = &microerror.Error{
+	Kind: "skipError",
+}
+
+// IsSkip asserts skipError.
+func IsSkip(err error) bool {
+	return microerror.Cause(err) == skipError
 }

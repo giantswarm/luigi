@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/giantswarm/luigi/pkg"
+	"github.com/google/go-cmp/cmp"
 )
 
 func Test_format(t *testing.T) {
@@ -60,7 +61,7 @@ func Test_format(t *testing.T) {
 			text:         `{"caller":"github.com/giantswarm/cluster-operator/vendor/github.com/giantswarm/operatorkit/controller/resource/retryresource/crud_resource_ops_wrapper.go:71","event":"update","function":"GetCurrentState","level":"warning","message":"retrying due to error","object":"/apis/core.giantswarm.io/v1alpha1/namespaces/default/kvmclusterconfigs/h0cg9-kvm-cluster-config","resource":"chartv2","stack":"[{/go/src/github.com/giantswarm/cluster-operator/vendor/github.com/giantswarm/operatorkit/controller/resource/retryresource/crud_resource_ops_wrapper.go:64: } {/go/src/github.com/giantswarm/cluster-operator/pkg/v2/resource/chart/current.go:37: } {/go/src/github.com/giantswarm/cluster-operator/pkg/v2/resource/chart/resource.go:126: } {/go/src/github.com/giantswarm/cluster-operator/vendor/github.com/giantswarm/helmclient/helmclient.go:236: rpc error: code = Unimplemented desc = unknown service grpc.health.v1.Health} {Tiller installation failed}]","time":"2018-06-01T06:26:15.261267+00:00","resource":"chartv2"}`,
 			grep:         "level=error",
 			expectedOut:  "",
-			errorMatcher: nil,
+			errorMatcher: IsSkip,
 		},
 		{
 			name: "case 4: as case 2 but grep for level==warning && function==GetCurrentState",
@@ -78,31 +79,49 @@ func Test_format(t *testing.T) {
 			name:         "case 5: as case 4 but grep for level==warning && function==GetCurrentState && non-existing-key==not_found yielding empty string",
 			text:         `{"caller":"github.com/giantswarm/cluster-operator/vendor/github.com/giantswarm/operatorkit/controller/resource/retryresource/crud_resource_ops_wrapper.go:71","event":"update","function":"GetCurrentState","level":"warning","message":"retrying due to error","object":"/apis/core.giantswarm.io/v1alpha1/namespaces/default/kvmclusterconfigs/h0cg9-kvm-cluster-config","resource":"chartv2","stack":"[{/go/src/github.com/giantswarm/cluster-operator/vendor/github.com/giantswarm/operatorkit/controller/resource/retryresource/crud_resource_ops_wrapper.go:64: } {/go/src/github.com/giantswarm/cluster-operator/pkg/v2/resource/chart/current.go:37: } {/go/src/github.com/giantswarm/cluster-operator/pkg/v2/resource/chart/resource.go:126: } {/go/src/github.com/giantswarm/cluster-operator/vendor/github.com/giantswarm/helmclient/helmclient.go:236: rpc error: code = Unimplemented desc = unknown service grpc.health.v1.Health} {Tiller installation failed}]","time":"2018-06-01T06:26:15.261267+00:00","resource":"chartv2"}`,
 			grep:         "level=warning,function=GetCurrentState,non-existing-key=not_found",
-			errorMatcher: nil,
+			errorMatcher: IsSkip,
 		},
 		{
 			name:         "case 6: be gentle with non-json input",
 			text:         `== some none JSON text ==`,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 		{
 			name:         "case 7: be gentle with json-pretending input",
 			text:         `{"i'm not a valid json": no-quotes-text}`,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 		{
 			name:         "case 8: be gentle even with emoji input",
 			text:         `🌅`,
 			expectedOut:  ``,
-			errorMatcher: IsJsonParse,
+			errorMatcher: IsJSONObjectParse,
 		},
 		{
 			name:         "case 9: deal with number values",
-			text:         `{"caller":"github.com/giantswarm/opsctl/command/deploy/command.go:169","level":"error","time":"2019-09-06T12:40:27.581957+00:00","verbosity":"0"}`,
-			expectedOut:  `U 09/06 12:40:27 | opsctl/command/deploy/command.go:169 | level=error | verbosity=0`,
+			text:         `{"caller":"github.com/giantswarm/opsctl/command/deploy/command.go:169","level":"error","time":"2019-09-06T12:40:27.581957+00:00","verbosity":0}`,
+			expectedOut:  `E 09/06 12:40:27 | opsctl/command/deploy/command.go:169 | verbosity=0`,
 			errorMatcher: nil,
+		},
+		{
+			name:         "case 10: ignore `null`",
+			text:         `null`,
+			expectedOut:  ``,
+			errorMatcher: IsJSONObjectParse,
+		},
+		{
+			name:         "case 11: ignore numbers",
+			text:         `7`,
+			expectedOut:  ``,
+			errorMatcher: IsJSONObjectParse,
+		},
+		{
+			name:         "case 12: ignore empty lines",
+			text:         ``,
+			expectedOut:  ``,
+			errorMatcher: IsJSONObjectParse,
 		},
 	}
 
@@ -129,8 +148,8 @@ func Test_format(t *testing.T) {
 				t.Fatalf("error == %#v, want matching", err)
 			}
 
-			if out != tc.expectedOut {
-				t.Errorf("out\n%s\nwant\n%s", out, tc.expectedOut)
+			if !cmp.Equal(out, tc.expectedOut) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOut, out))
 			}
 		})
 	}

@@ -1,9 +1,10 @@
+[![CircleCI](https://circleci.com/gh/giantswarm/luigi.svg?style=shield)](https://circleci.com/gh/giantswarm/luigi)
 # luigi
 
 ## Installation
 
 ```
-go get github.com/giantswarm/luigi
+GO111MODULE="on" go get github.com/giantswarm/luigi
 ```
 
 ## Usage

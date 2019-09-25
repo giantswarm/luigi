@@ -41,24 +41,21 @@ func disableColors(v bool) {
 }
 
 func format(text []byte, grep *pkg.Grep) (string, error) {
-	//// TODO test
-	//if len(text) == 0 {
-	//	return "", nil
-	//}
-	//// TODO test
-	//// Avoid parsing non-object JSON inputs.
-	//if text[0] != '{' {
-	//	return text, nil
-	//}
+	if len(text) == 0 {
+		return "", microerror.Maskf(jsonObjectParseError, "empty string")
+	}
+	if text[0] != '{' {
+		return "", microerror.Maskf(jsonObjectParseError, "text must start with %#q", "{")
+	}
 
 	var m map[string]interface{}
 	err := json.Unmarshal(text, &m)
 	if err != nil {
-		return "", microerror.Maskf(jsonParseError, err.Error())
+		return "", microerror.Maskf(jsonObjectParseError, err.Error())
 	}
 
 	if !grep.Filter(m) {
-		return "", nil
+		return "", microerror.Maskf(skipError, "line does not match grep criteria")
 	}
 
 	line, msg := getLevelMessage(m)
@@ -135,7 +132,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 }
 
 func getLevelMessage(m map[string]interface{}) (level string, message string) {
-	switch m["level"] {
+	switch getString(m, "level") {
 	case "debug":
 		level = white("D")
 	case "info":
@@ -152,7 +149,7 @@ func getLevelMessage(m map[string]interface{}) (level string, message string) {
 
 	message = getString(m, "message")
 
-	if len(level) > 0 && len(message) > 0 {
+	if len(level) > 0 {
 		delete(m, "level")
 		delete(m, "message")
 		return
@@ -209,11 +206,14 @@ func getStack(m map[string]interface{}) string {
 
 func getString(m map[string]interface{}, key string) string {
 	v := m[key]
+	if v == nil {
+		return ""
+	}
 
 	s, ok := v.(string)
 	if ok {
 		return s
 	}
 
-	return fmt.Sprintf("%v", s)
+	return fmt.Sprintf("%v", v)
 }
