@@ -205,7 +205,10 @@ func getStack(m map[string]interface{}) string {
 }
 
 func getString(m map[string]interface{}, key string) string {
-	v := m[key]
+	v, ok := m[key]
+	if ok && v == nil {
+		return "nil"
+	}
 	if v == nil {
 		return ""
 	}
