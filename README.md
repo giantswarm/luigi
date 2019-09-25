@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/giantswarm/luigi.svg?style=shield)](https://circleci.com/gh/giantswarm/luigi)
 # luigi
 
 ## Installation
