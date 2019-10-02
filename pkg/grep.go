@@ -71,7 +71,7 @@ func NewGrep(expr string) (*Grep, error) {
 	return g, nil
 }
 
-func (g *Grep) Filter(m map[string]string) bool {
+func (g *Grep) Filter(m map[string]interface{}) bool {
 	if len(g.kvs) == 0 {
 		return true
 	}
@@ -93,10 +93,15 @@ type grepKV struct {
 	WildcardSuffix bool
 }
 
-func (g *grepKV) Filter(m map[string]string) bool {
-	v, ok := m[g.K]
+func (g *grepKV) Filter(m map[string]interface{}) bool {
+	raw, ok := m[g.K]
 	if !ok {
 		return false
+	}
+
+	v, ok := raw.(string)
+	if !ok {
+		v = fmt.Sprintf("%v", raw)
 	}
 
 	for _, x := range g.Vs {

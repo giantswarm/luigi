@@ -117,6 +117,18 @@ func Test_format(t *testing.T) {
 			expectedOut:  ``,
 			errorMatcher: IsJSONObjectParse,
 		},
+		{
+			name:         "case 12: deal with number values",
+			text:         `{"caller":"github.com/giantswarm/opsctl/command/deploy/command.go:169","level":"error","time":"2019-09-06T12:40:27.581957+00:00","verbosity":0}`,
+			expectedOut:  `E 09/06 12:40:27 | opsctl/command/deploy/command.go:169 | verbosity=0`,
+			errorMatcher: nil,
+		},
+		{
+			name:         "case 13: deal with null values",
+			text:         `{"caller":"github.com/giantswarm/opsctl/command/deploy/command.go:169","level":"error","time":"2019-09-06T12:40:27.581957+00:00","verbosity":null}`,
+			expectedOut:  `E 09/06 12:40:27 | opsctl/command/deploy/command.go:169 | verbosity=<nil>`,
+			errorMatcher: nil,
+		},
 	}
 
 	disableColors(true)
