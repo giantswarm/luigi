@@ -1,0 +1,2 @@
+{"caller":"file:71","function":"GetCurrentState","level":"warning","message":"retrying due to error","resource":"chart","time":"2018-06-01T06:30:15.261267+00:00"}
+{"caller":"file:71","function":"GetCurrentState","level":"error","message":"failed due to error","resource":"chart","time":"2018-06-01T06:30:16.261267+00:00"}

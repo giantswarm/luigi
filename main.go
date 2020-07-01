@@ -2,11 +2,14 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/giantswarm/luigi/pkg"
+	"github.com/giantswarm/microerror"
 )
 
 func main() {
@@ -22,13 +25,22 @@ func main() {
 		disableColors(false)
 	}
 
-	grep, err := pkg.NewGrep(*flagGrep)
+	ctx := context.Background()
+
+	err := mainE(ctx, os.Stdin, os.Stdout, *flagGrep)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprintf(os.Stderr, microerror.JSON(err))
 		os.Exit(1)
 	}
+}
 
-	scanner := bufio.NewScanner(os.Stdin)
+func mainE(ctx context.Context, in io.Reader, out io.Writer, grepExpr string) error {
+	grep, err := pkg.NewGrep(grepExpr)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	scanner := bufio.NewScanner(in)
 	scanner.Split(newSplitter().Split)
 	for scanner.Scan() {
 		line, err := format(scanner.Bytes(), grep)
@@ -38,16 +50,16 @@ func main() {
 			// Don't print empty line.
 			line = ""
 		} else if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
-			os.Exit(1)
+			return microerror.Mask(err)
 		} else {
 			line += "\n"
 		}
 
-		fmt.Printf("%s", line)
+		fmt.Fprintf(out, "%s", line)
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "reading standard input:", err)
-		os.Exit(1)
+		return microerror.Mask(err)
 	}
+
+	return nil
 }
