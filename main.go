@@ -8,8 +8,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/giantswarm/luigi/pkg"
 	"github.com/giantswarm/microerror"
+
+	"github.com/giantswarm/luigi/pkg"
 )
 
 func main() {
@@ -29,7 +30,7 @@ func main() {
 
 	err := mainE(ctx, os.Stdin, os.Stdout, *flagGrep)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, microerror.JSON(err))
+		fmt.Fprintf(os.Stderr, "%s\n", microerror.JSON(err))
 		os.Exit(1)
 	}
 }

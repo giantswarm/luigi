@@ -28,8 +28,7 @@ func Test_split(t *testing.T) {
 					`{"a": "b"} text` + "\n",
 				}
 
-				var r io.Reader
-				r = strings.NewReader(strings.Join(lines, ""))
+				r := strings.NewReader(strings.Join(lines, ""))
 
 				return r
 			},

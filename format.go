@@ -8,36 +8,25 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/giantswarm/luigi/pkg"
 	"github.com/giantswarm/microerror"
+
+	"github.com/giantswarm/luigi/pkg"
 )
 
 var (
-	black   = color.New(color.FgBlack).SprintFunc()
-	red     = color.New(color.FgRed).SprintFunc()
-	green   = color.New(color.FgGreen).SprintFunc()
-	yellow  = color.New(color.FgYellow).SprintFunc()
-	blue    = color.New(color.FgBlue).SprintFunc()
-	magenta = color.New(color.FgMagenta).SprintFunc()
-	cyan    = color.New(color.FgCyan).SprintFunc()
-	white   = color.New(color.FgWhite).SprintFunc()
+	red    = color.New(color.FgRed).SprintFunc()
+	green  = color.New(color.FgGreen).SprintFunc()
+	yellow = color.New(color.FgYellow).SprintFunc()
+	cyan   = color.New(color.FgCyan).SprintFunc()
+
+	bold  = color.New(color.Bold).SprintFunc()
+	reset = color.New(color.Reset).SprintFunc()
 
 	separator = red(" | ")
 )
 
 func disableColors(v bool) {
 	color.NoColor = v
-
-	black = color.New(color.FgBlack).SprintFunc()
-	red = color.New(color.FgRed).SprintFunc()
-	green = color.New(color.FgGreen).SprintFunc()
-	yellow = color.New(color.FgYellow).SprintFunc()
-	blue = color.New(color.FgBlue).SprintFunc()
-	magenta = color.New(color.FgMagenta).SprintFunc()
-	cyan = color.New(color.FgCyan).SprintFunc()
-	white = color.New(color.FgWhite).SprintFunc()
-
-	separator = red(" | ")
 }
 
 func format(text []byte, grep *pkg.Grep) (string, error) {
@@ -79,7 +68,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 	resource := getString(m, "resource") // Set by operatorkit framework.
 	delete(m, "resource")
 	if len(resource) > 0 {
-		line += " " + resource
+		line += " " + bold(resource)
 	}
 
 	function := getString(m, "function") // Set by operatorkit framework.
@@ -93,7 +82,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 	}
 
 	if len(msg) > 0 {
-		line += " " + white(msg)
+		line += " " + reset(msg)
 	}
 
 	caller := getString(m, "caller")
@@ -113,7 +102,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 	keys := make([]string, len(m))
 	{
 		var i int
-		for k, _ := range m {
+		for k := range m {
 			keys[i] = k
 			i++
 		}
@@ -134,7 +123,7 @@ func format(text []byte, grep *pkg.Grep) (string, error) {
 func getLevelMessage(m map[string]interface{}) (level string, message string) {
 	switch getString(m, "level") {
 	case "debug":
-		level = white("D")
+		level = reset("D")
 	case "info":
 		level = cyan("I")
 	case "warning":
@@ -142,7 +131,7 @@ func getLevelMessage(m map[string]interface{}) (level string, message string) {
 	case "error":
 		level = red("E")
 	default:
-		level = white("U")
+		level = reset("U")
 	}
 	delete(m, "level")
 
@@ -157,7 +146,7 @@ func getLevelMessage(m map[string]interface{}) (level string, message string) {
 
 	switch {
 	case len(getString(m, "debug")) > 0:
-		level = white("D")
+		level = reset("D")
 		message = getString(m, "debug")
 		delete(m, "debug")
 	case len(getString(m, "info")) > 0:
@@ -175,8 +164,10 @@ func getLevelMessage(m map[string]interface{}) (level string, message string) {
 	}
 
 	if len(level) == 0 {
-		level = white("U")
+		level = reset("U")
 	}
+
+	level = bold(level)
 
 	return
 }
