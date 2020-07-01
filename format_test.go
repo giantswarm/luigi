@@ -108,7 +108,7 @@ func Test_format(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if !bytes.Equal([]byte(out), goldenFile) {
+			if !bytes.Equal(out, goldenFile) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(string(goldenFile), string(out)))
 			}
 		})
