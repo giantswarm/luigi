@@ -182,6 +182,35 @@ func getLevelMessage(m map[string]interface{}) (level string, message string) {
 }
 
 func getStack(m map[string]interface{}) string {
+	stack, ok := m["stack"]
+	if !ok {
+		return ""
+	}
+
+	data, err := json.Marshal(stack)
+	if err != nil {
+		panic("marshalling map[string]interface{} should not fail: " + microerror.JSON(err))
+	}
+
+	var jsonErr microerror.JSONError
+	err = json.Unmarshal(data, &jsonErr)
+	if err != nil {
+		return getStackLegacy(m)
+	}
+
+	delete(m, "stack")
+
+	var s string
+	for i := len(jsonErr.Stack) - 1; i >= 0; i-- {
+		e := jsonErr.Stack[i]
+		s += fmt.Sprintf("\n\t%s:%d", e.File, e.Line)
+	}
+	s += "\n\t" + jsonErr.Error.Error() + ": " + jsonErr.Annotation
+
+	return s
+}
+
+func getStackLegacy(m map[string]interface{}) string {
 	stack := getString(m, "stack")
 	if len(stack) == 0 {
 		return ""

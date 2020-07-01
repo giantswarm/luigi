@@ -1,0 +1,8 @@
+E 07/01 12:21:29 | micrologger@v0.3.1/activation_logger.go:93 | verbosity=0
+	/Users/kopiczko/go/src/github.com/giantswarm/opsctl/command/deploy/command.go:356
+	/Users/kopiczko/go/src/github.com/giantswarm/opsctl/pkg/output/funcs.go:33
+	/Users/kopiczko/go/src/github.com/giantswarm/opsctl/command/deploy/command.go:346
+	/Users/kopiczko/go/src/github.com/giantswarm/opsctl/pkg/cmd/deploy/appdeploy/deployer.go:347
+	/Users/kopiczko/go/pkg/mod/github.com/giantswarm/backoff@v0.2.0/retry.go:13
+	/Users/kopiczko/go/src/github.com/giantswarm/opsctl/pkg/cmd/deploy/appdeploy/deployer.go:338
+	unknown: execution failed error: deployment failed (status: `FAILED`, reason: `Release "aws-operator-k8scloudconfig-0.6.3" failed: admission webhook "validation.gatekeeper.sh" denied the request: [denied by unique-operator-version] label app.kubernetes.io/version=8.7.1-dev is not unique in resources of kind "Deployment"`)
