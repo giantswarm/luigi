@@ -14,7 +14,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-var update = flag.Bool("update", false, "update .golden CF template file")
+var update = flag.Bool("update", false, "update .golden reference log files")
 
 // Test_format uses golden files.
 //
