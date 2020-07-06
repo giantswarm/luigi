@@ -104,7 +104,7 @@ func Test_format(t *testing.T) {
 			p := filepath.Join("testdata", tc.expectedGoldenFile)
 
 			if *update {
-				err := ioutil.WriteFile(p, out, 0644)
+				err := ioutil.WriteFile(p, out, 0644) // nolint:gosec
 				if err != nil {
 					t.Fatalf("err = %#q, want %#v", microerror.JSON(err), nil)
 				}
