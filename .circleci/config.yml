@@ -1,11 +1,12 @@
 version: 2.1
 orbs:
-  architect: giantswarm/architect@0.4.0
+  architect: giantswarm/architect@4.13.0
 
 workflows:
   go-build:
     jobs:
       - architect/go-build:
+          context: architect
           name: go-build-luigi
           binary: luigi
           # Needed to trigger job also on git tag.
