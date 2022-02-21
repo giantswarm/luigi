@@ -1,72 +1,23 @@
 # DO NOT EDIT. Generated with:
 #
-#    devctl gen makefile
+#    devctl@4.19.0
 #
 
-APPLICATION    := $(shell basename $(shell go list .))
-BUILDTIMESTAMP := $(shell date -u '+%FT%TZ')
-GITSHA1        := $(shell git rev-parse --verify HEAD)
-OS             := $(shell go env GOOS)
-SOURCES        := $(shell find . -name '*.go')
-VERSION        := $(shell architect project version)
-LDFLAGS        ?= -w -linkmode 'auto' -extldflags '-static' \
-  -X '$(shell go list .)/pkg/project.buildTimestamp=${BUILDTIMESTAMP}' \
-  -X '$(shell go list .)/pkg/project.gitSHA=${GITSHA1}' \
-  -X '$(shell go list .)/pkg/project.version=${VERSION}'
-.DEFAULT_GOAL := build
+include Makefile.*.mk
 
-.PHONY: build build-darwin build-linux
-## build: builds a local binary
-build: $(APPLICATION)
-## build-darwin: builds a local binary for darwin/amd64
-build-darwin: $(APPLICATION)-darwin
-## build-linux: builds a local binary for linux/amd64
-build-linux: $(APPLICATION)-linux
+##@ General
 
-$(APPLICATION): $(APPLICATION)-$(OS)
-	cp -a $< $@
-
-$(APPLICATION)-%: $(SOURCES)
-	GOOS=$* GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $@ .
-
-.PHONY: install
-## install: install the application
-install:
-	go install -ldflags "$(LDFLAGS)" .
-
-.PHONY: run
-## run: runs go run main.go
-run:
-	go run -ldflags "$(LDFLAGS)" -race .
-
-.PHONY: clean
-## clean: cleans the binary
-clean:
-	rm -f $(APPLICATION)*
-	go clean
-
-.PHONY: imports
-## imports: runs goimports
-imports:
-	goimports -local $(shell go list .) -w .
-
-.PHONY: lint
-## lint: runs golangci-lint
-lint:
-	golangci-lint run -E gosec -E goconst --timeout=15m ./...
-
-.PHONY: test
-## test: runs go test with default values
-test:
-	go test -ldflags "$(LDFLAGS)" -race ./...
-
-.PHONY: build-docker
-## build-docker: builds docker image to registry
-build-docker: build-linux
-	docker build -t ${APPLICATION}:${VERSION} .
+# The help target prints out all targets with their descriptions organized
+# beneath their categories. The categories are represented by '##@' and the
+# target descriptions by '##'. The awk commands is responsible for reading the
+# entire set of makefiles included in this invocation, looking for lines of the
+# file as xyz: ## something, and then pretty-format the target and help. Then,
+# if there's a line with ##@ something, that gets pretty-printed as a category.
+# More info on the usage of ANSI control characters for terminal formatting:
+# https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
+# More info on the awk command:
+# http://linuxcommand.org/lc3_adv_awk.php
 
 .PHONY: help
-## help: prints this help message
-help:
-	@echo "Usage: \n"
-	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
