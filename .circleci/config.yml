@@ -6,6 +6,7 @@ workflows:
   go-build:
     jobs:
       - architect/go-build:
+          context: architect
           name: go-build-luigi
           binary: luigi
           # Needed to trigger job also on git tag.
