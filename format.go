@@ -21,8 +21,6 @@ var (
 
 	bold  = color.New(color.Bold).SprintFunc()
 	reset = color.New(color.Reset).SprintFunc()
-
-	separator = red(" | ")
 )
 
 func disableColors(v bool) {
@@ -30,6 +28,8 @@ func disableColors(v bool) {
 }
 
 func format(text []byte, grep *pkg.Grep) (string, error) {
+	separator := red(" | ")
+
 	if len(text) == 0 {
 		return "", microerror.Maskf(jsonObjectParseError, "empty string")
 	}
