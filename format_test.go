@@ -18,8 +18,7 @@ var update = flag.Bool("update", false, "update .golden reference log files")
 
 // Test_format uses golden files.
 //
-//  go test . -run Test_format -update
-//
+//	go test . -run Test_format -update
 func Test_format(t *testing.T) {
 	testCases := []struct {
 		name               string
