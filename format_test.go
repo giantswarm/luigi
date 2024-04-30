@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"flag"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -18,8 +17,7 @@ var update = flag.Bool("update", false, "update .golden reference log files")
 
 // Test_format uses golden files.
 //
-//  go test . -run Test_format -update
-//
+//	go test . -run Test_format -update
 func Test_format(t *testing.T) {
 	testCases := []struct {
 		name               string
@@ -104,13 +102,13 @@ func Test_format(t *testing.T) {
 			p := filepath.Join("testdata", tc.expectedGoldenFile)
 
 			if *update {
-				err := ioutil.WriteFile(p, out, 0644) // nolint:gosec
+				err := os.WriteFile(p, out, 0644) // nolint:gosec
 				if err != nil {
 					t.Fatalf("err = %#q, want %#v", microerror.JSON(err), nil)
 				}
 			}
 
-			goldenFile, err := ioutil.ReadFile(p)
+			goldenFile, err := os.ReadFile(p)
 			if err != nil {
 				t.Fatal(err)
 			}

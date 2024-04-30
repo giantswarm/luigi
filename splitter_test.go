@@ -12,6 +12,13 @@ import (
 
 func Test_split(t *testing.T) {
 
+	lines := []string{
+		"a" + "\n",
+		"b" + "\n",
+		`{"a": "b"}` + "\n",
+		`text {"a": "b"}` + "\n",
+		`{"a": "b"} text` + "\n",
+	}
 	testCases := []struct {
 		name            string
 		inputReaderFunc func() io.Reader
@@ -20,37 +27,17 @@ func Test_split(t *testing.T) {
 		{
 			name: "case 0: read everything at once",
 			inputReaderFunc: func() io.Reader {
-				lines := []string{
-					"a" + "\n",
-					"b" + "\n",
-					`{"a": "b"}` + "\n",
-					`text {"a": "b"}` + "\n",
-					`{"a": "b"} text` + "\n",
-				}
-
+				lines := lines
 				r := strings.NewReader(strings.Join(lines, ""))
 
 				return r
 			},
-			expectedScans: []string{
-				"a" + "\n",
-				"b" + "\n",
-				`{"a": "b"}` + "\n",
-				`text {"a": "b"}` + "\n",
-				`{"a": "b"} text` + "\n",
-			},
+			expectedScans: lines,
 		},
 		{
 			name: "case 1: read byte by byte",
 			inputReaderFunc: func() io.Reader {
-				lines := []string{
-					"a" + "\n",
-					"b" + "\n",
-					`{"a": "b"}` + "\n",
-					`text {"a": "b"}` + "\n",
-					`{"a": "b"} text` + "\n",
-				}
-
+				lines := lines
 				var r io.Reader
 				r = strings.NewReader(strings.Join(lines, ""))
 
