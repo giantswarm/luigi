@@ -15,7 +15,7 @@ on:
 jobs:
   debug_info:
     name: Debug info
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Print github context JSON
         run: |
@@ -24,7 +24,7 @@ jobs:
           EOF
   gather_facts:
     name: Gather facts
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     outputs:
       project_go_path: ${{ steps.get_project_go_path.outputs.path }}
       ref_version: ${{ steps.ref_version.outputs.refversion }}
@@ -84,7 +84,7 @@ jobs:
           echo "::set-output name=refversion::${refversion}"
   update_project_go:
     name: Update project.go
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: ${{ needs.gather_facts.outputs.version != '' && needs.gather_facts.outputs.project_go_path != '' && needs.gather_facts.outputs.ref_version != 'true' }}
     needs:
       - gather_facts
@@ -144,7 +144,7 @@ jobs:
           hub pull-request -f  -m "${{ env.title }}" -b ${{ env.base }} -h ${{ env.branch }} -r ${{ github.actor }}
   create_release:
     name: Create release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs:
       - gather_facts
     if: ${{ needs.gather_facts.outputs.version }}
@@ -189,7 +189,7 @@ jobs:
 
   create-release-branch:
     name: Create release branch
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs:
       - gather_facts
     if: ${{ needs.gather_facts.outputs.version }}
@@ -249,7 +249,7 @@ jobs:
 
   create_and_upload_build_artifacts:
     name: Create and upload build artifacts
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         platform:
