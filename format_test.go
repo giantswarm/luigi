@@ -108,7 +108,7 @@ func Test_format(t *testing.T) {
 				}
 			}
 
-			goldenFile, err := os.ReadFile(p)
+			goldenFile, err := os.ReadFile(p) // nolint:gosec
 			if err != nil {
 				t.Fatal(err)
 			}
