@@ -56,7 +56,7 @@ func mainE(ctx context.Context, in io.Reader, out io.Writer, grepExpr string) er
 			line += "\n"
 		}
 
-		fmt.Fprintf(out, "%s", line)
+		_, _ = fmt.Fprintf(out, "%s", line)
 	}
 	if err := scanner.Err(); err != nil {
 		return microerror.Mask(err)

@@ -218,8 +218,8 @@ func getStackLegacy(m map[string]interface{}) string {
 
 	stack = stack[2 : len(stack)-2]
 	stack = "\n\t" + stack
-	stack = strings.Replace(stack, " } {", "\n\t", -1)
-	stack = strings.Replace(stack, "} {", "\n\t", -1)
+	stack = strings.ReplaceAll(stack, " } {", "\n\t")
+	stack = strings.ReplaceAll(stack, "} {", "\n\t")
 
 	return stack
 }
