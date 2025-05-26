@@ -118,7 +118,7 @@ jobs:
       architect_flags: "--organisation ${{ github.repository_owner }} --project ${{ needs.gather_facts.outputs.repo_name }}"
     steps:
       - name: Install architect
-        uses: giantswarm/install-binary-action@v1.0.0
+        uses: giantswarm/install-binary-action@v1.1.0
         with:
           binary: "architect"
           version: "6.1.0"
