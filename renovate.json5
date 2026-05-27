@@ -1,0 +1,7 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>giantswarm/renovate-presets:default.json5",
+    "github>giantswarm/renovate-presets:lang-go.json5"
+  ]
+}
