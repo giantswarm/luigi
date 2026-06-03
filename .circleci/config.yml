@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  architect: giantswarm/architect@8.2.2
+  architect: giantswarm/architect@9.1.0
 
 workflows:
   go-build:
@@ -9,7 +9,20 @@ workflows:
           context: architect
           name: go-build-luigi
           binary: luigi
+          architectures: "linux/amd64,linux/arm64,darwin/amd64,darwin/arm64,windows/amd64,windows/arm64"
           # Needed to trigger job also on git tag.
           filters:
             tags:
               only: /^v.*/
+
+      - architect/upload-release-assets:
+          context: architect
+          name: upload-release-assets
+          binary: luigi
+          requires:
+            - go-build-luigi
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/

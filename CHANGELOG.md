@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Release binaries now include darwin/amd64, darwin/arm64, windows/amd64, and windows/arm64 alongside the existing linux targets. Windows binaries are named `luigi-windows-<arch>.exe`.
 - Updated golang.org/x/sys so the project can be built on mac and with go 1.18. See: https://github.com/golang/go/issues/49219
 - Upgrade dependencies
 - Upgrade to Go 1.21
